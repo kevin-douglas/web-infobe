@@ -7,7 +7,8 @@ import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 
-interface InputDefaultProps<T extends FieldValues> extends React.ComponentProps<"input"> {
+interface InputDefaultProps<T extends FieldValues>
+  extends React.ComponentProps<"input"> {
   id: Path<T>;
   label: string;
   register: UseFormRegister<T>;
@@ -23,9 +24,8 @@ export function InputDefault<T extends FieldValues>({
   icon,
   errorMessage,
   hasValue,
-  ...props  
+  ...props
 }: InputDefaultProps<T>) {
-  console.log(props?.value)
   return (
     <Label className="flex flex-col w-full gap-2 items-start">
       <Paragraph type="P1">{label}</Paragraph>
@@ -40,7 +40,7 @@ export function InputDefault<T extends FieldValues>({
             "focus-visible:text-primary-200 focus-visible:ring-primary-200 focus-visible:ring-[1.5px] selection:text ",
             "selection:bg-primary-100 selection:text-white",
             {
-              "border-system-error text-system-error placeholder:text-system-error focus-visible:ring-system-error":
+              "border-system-error text-system-error placeholder:text-system-error focus-visible:ring-system-error focus-visible:text-system-error":
                 !!errorMessage,
               "pl-[56px] ": !!icon,
             }
@@ -56,14 +56,19 @@ export function InputDefault<T extends FieldValues>({
                 "group-focus-within:text-primary-200",
                 {
                   "text-primary-200": hasValue,
-                  "group-focus-within:text-system-error text-system-error": !!errorMessage,
+                  "group-focus-within:text-system-error text-system-error":
+                    !!errorMessage,
                 }
               )}
             />
           </div>
         )}
 
-        {!!errorMessage && <Paragraph type="P2" className="text-system-error text-right">{errorMessage}</Paragraph>}
+        {!!errorMessage && (
+          <Paragraph type="P2" className="text-system-error text-right">
+            {errorMessage}
+          </Paragraph>
+        )}
       </div>
     </Label>
   );

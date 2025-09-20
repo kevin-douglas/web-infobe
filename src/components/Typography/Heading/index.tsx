@@ -11,7 +11,7 @@ export const Heading: React.FC<HeadingProps> = ({
   ...props
 }) => {
   const className = cn(
-    "font-semibold",
+    "font-semibold text-black-90",
     {
       "text-[20px]": type === "H1",
       "text-[16px]": type === "H2",
