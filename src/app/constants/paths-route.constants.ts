@@ -8,10 +8,12 @@ export const PATHS_ROUTE = {
     SIGN_UP: '/cadastro',
   },
   DASHBOARD: {
-    HOME: '/home',
-    USERS: {
-      HOME: '/dashboard/usuarios',
-      PROFILE: '/dashboard/usuarios/perfil',
+    HOME: '/dashboard',
+    COURSES: {
+      HOME: '/dashboard/cursos',
+    },
+    CERTIFICATE: {
+      HOME: '/dashboard/certificados',
     },
   },
 } as const;

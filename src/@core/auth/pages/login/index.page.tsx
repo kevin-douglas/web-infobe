@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import Button from "@/components/Button";
+import Button from '@/components/Button';
 
-import { InputDefault } from "@/components/Form/Inputs/InputDefault";
-import { Heading } from "@/components/Typography/Heading";
-import { useForm } from "react-hook-form";
-import { LoginForm, LoginFormSchema } from "./login.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AuthService } from "../../service/auth.service";
-import { useRouter } from "next/navigation";
+import { InputDefault } from '@/components/Form/Inputs/InputDefault';
+import { Heading } from '@/components/Typography/Heading';
+import { useForm } from 'react-hook-form';
+import { LoginForm, LoginFormSchema } from './login.validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AuthService } from '../../service/auth.service';
 
 export const LoginPage: React.FC = () => {
   const {
@@ -19,36 +18,51 @@ export const LoginPage: React.FC = () => {
     formState: { errors, isValid },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(LoginForm),
-    mode: "onChange",
+    mode: 'onChange',
   });
-
-  const router = useRouter();
 
   const servicePostLogin = async (form: LoginFormSchema) => {
     try {
       const { data } = await AuthService.postLogin(form);
 
       if (data) {
-        router.push("/dashboard");
+        const response = await fetch('/api/auth/create-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: data.name,
+            email: form.email,
+            role: data.role,
+            accessToken: data.accessToken,
+          }),
+        });
+
+        if (response.ok) {
+          window.location.href = '/dashboard';
+        } else {
+          throw new Error('Erro ao criar sessão');
+        }
       }
     } catch (err) {
       console.log({ err });
-      setError("password", { message: "E-mail/senha incorretos" });
+      setError('password', { message: 'E-mail/senha incorretos' });
     }
   };
 
   return (
-    <section className="flex w-full h-full">
-      <div className="flex flex-col w-full h-dvh py-8 px-6 gap-12 place-self-center lg:pt-16 lg:px-0">
+    <section className="flex h-full w-full">
+      <div className="flex h-dvh w-full flex-col gap-12 place-self-center px-6 py-8 lg:px-0 lg:pt-16">
         <form
           autoComplete="off"
           onSubmit={handleSubmit(servicePostLogin)}
-          className="flex flex-col w-full h-full gap-12 max-w-[720px] lg:max-w-[468px] md:place-self-center md:md:h-fit"
+          className="flex h-full w-full max-w-[720px] flex-col gap-12 md:md:h-fit md:place-self-center lg:max-w-[468px]"
         >
-          <div className="flex flex-col w-full h-full gap-12">
+          <div className="flex h-full w-full flex-col gap-12">
             <Heading type="H1">Acessar conta</Heading>
 
-            <div className="flex flex-col w-full h-full gap-6">
+            <div className="flex h-full w-full flex-col gap-6">
               <InputDefault<LoginFormSchema>
                 id="email"
                 type="email"
@@ -85,9 +99,9 @@ export const LoginPage: React.FC = () => {
       </div>
 
       <div
-        className="hidden lg:flex w-full h-full"
+        className="hidden h-full w-full lg:flex"
         style={{
-          backgroundImage: "url(./images/bg-login.png)",
+          backgroundImage: 'url(./images/bg-login.png)',
         }}
       />
     </section>

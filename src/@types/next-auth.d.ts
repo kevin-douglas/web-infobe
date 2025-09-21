@@ -5,12 +5,16 @@ declare module "next-auth" {
     role: "USER" | "ADMIN";
     accessToken: string;
     email: string;
+    name: string;
   }
 
   interface Session {
     role: "USER" | "ADMIN";
     accessToken: string;
     email: string;
+    user: {
+      name?: string | null;
+    } & DefaultUser;
   }
 }
 
@@ -19,5 +23,6 @@ declare module "next-auth/jwt" {
     role: "USER" | "ADMIN";
     accessToken: string;
     email: string;
+    name?: string | null;
   }
 }

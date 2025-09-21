@@ -50,7 +50,10 @@ function SidebarList({
       )}
     >
       {!collapsed && (
-        <Heading type="H1" className="mx-0 pt-12 text-center text-[32px]">
+        <Heading
+          type="H1"
+          className="mx-0 pt-12 text-center text-[32px] text-black-0"
+        >
           InfoBe
         </Heading>
       )}
@@ -93,7 +96,11 @@ function SidebarList({
                           isActive ? 'text-text-primary' : 'text-black-0',
                         )}
                       />
-                      {!collapsed && <Heading type="H2">{r.title}</Heading>}
+                      {!collapsed && (
+                        <Heading type="H2" className="text-black-0">
+                          {r.title}
+                        </Heading>
+                      )}
                     </div>
                   </Link>
                 );
@@ -253,7 +260,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 className="flex cursor-pointer items-center gap-4 px-6 py-2"
               >
                 <Icon icon="tabler:logout" className="h-6 w-6 text-black-0" />
-                {!collapsed && <Heading type="H2">Sair</Heading>}
+                {!collapsed && (
+                  <Heading type="H2" className="text-black-0">
+                    Sair
+                  </Heading>
+                )}
               </button>
             )}
           </div>

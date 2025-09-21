@@ -1,46 +1,14 @@
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-
-import { AuthService } from "@/@core/auth/service/auth.service";
-import { uuidv4 } from "zod";
 
 const handler = NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-
-        try {
-          const { data } = await AuthService.postLogin({
-            email: credentials.email,
-            password: credentials.password,
-          });
-
-          const id = uuidv4();
-          return {
-            id: String(id),
-            role: data.role,
-            email: credentials.email,
-            accessToken: data.accessToken,
-          };
-        } catch (error) {
-          console.error("Credentials authorization error:", error);
-          throw new Error("Invalid credentials");
-        }
-      },
-    }),
-  ],
+  providers: [],
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
         token.email = user.email;
+        token.name = user.name;
         token.accessToken = user.accessToken;
       }
       return token;
@@ -48,9 +16,10 @@ const handler = NextAuth({
 
     async session({ session, token }) {
       if (token && session.user) {
-        session.role = token.role;
-        session.email = token.email;
-        session.accessToken = token.accessToken;
+        session.role = token.role as any;
+        session.email = token.email as any;
+        session.user.name = token.name as any;
+        session.accessToken = token.accessToken as any;
       }
       return session;
     },

@@ -41,16 +41,13 @@ export default function Page() {
   return (
     <div className="flex flex-col gap-12">
       <div className="flex flex-col gap-3">
-        <Heading type="H1">
-          👋 Olá, <span className="text-primary-200">{session.user.name}</span>!
-          Vamos continuar aprendendo?
-        </Heading>
+        <Heading type="H1">O que você quer aprender hoje?</Heading>
         <Heading type="H2" className="text-black-80">
-          Você está indo muito bem!
+          Tem sempre algo novo esperando por você
         </Heading>
       </div>
-      <CardSession items={items} title="Últimas aulas vistas" more />
-      <CardSession items={items} title="Cursos recomendados" />
+      <CardSession items={items} title="Seus cursos" more />
+      <CardSession items={items} title="Cursos recomendados" more />
     </div>
   );
 }

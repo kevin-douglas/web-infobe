@@ -36,21 +36,29 @@ export default function Page() {
       title: 'Aula 04 - Como utilizar fórmulas',
       courseName: 'Curso de Excel básico',
     },
+    {
+      imageUrl: 'https://placehold.co/600x400.png',
+      imageAlt: 'Planilha de Excel aberta em um notebook',
+      title: 'Aula 04 - Como utilizar fórmulas',
+      courseName: 'Curso de Excel básico',
+    },
+    {
+      imageUrl: 'https://placehold.co/600x400.png',
+      imageAlt: 'Planilha de Excel aberta em um notebook',
+      title: 'Aula 04 - Como utilizar fórmulas',
+      courseName: 'Curso de Excel básico',
+    },
   ];
 
   return (
     <div className="flex flex-col gap-12">
       <div className="flex flex-col gap-3">
-        <Heading type="H1">
-          👋 Olá, <span className="text-primary-200">{session.user.name}</span>!
-          Vamos continuar aprendendo?
-        </Heading>
+        <Heading type="H1">Meus certificados</Heading>
         <Heading type="H2" className="text-black-80">
-          Você está indo muito bem!
+          Tudo explicadinho, do seu jeito
         </Heading>
       </div>
-      <CardSession items={items} title="Últimas aulas vistas" more />
-      <CardSession items={items} title="Cursos recomendados" />
+      <CardSession items={items} title="Seus cursos" loadAll />
     </div>
   );
 }

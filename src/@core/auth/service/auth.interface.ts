@@ -6,4 +6,5 @@ export interface PostLoginProps {
 export interface PostLogin {
   accessToken: string;
   role: "USER" | "ADMIN";
+  name: string;
 }
