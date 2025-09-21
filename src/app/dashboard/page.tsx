@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const { data: session, status } = useSession();
-
+  console.log(session);
   if (status === 'loading') {
     return <div className="p-4">Carregando...</div>;
   }
