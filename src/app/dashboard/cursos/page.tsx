@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/Button';
+import ModuleAccordion from '@/components/Accordion/module-accordion';
 
 import { useSession } from 'next-auth/react';
 import { CardSession } from '@/components/Cards/card-session';
@@ -66,6 +67,33 @@ export default function Page() {
       </div>
       <CardSession items={items} title="Seus cursos" more />
       <CardSession items={items} title="Cursos recomendados" more />
+      <div className="mx-auto w-full p-6">
+        <ModuleAccordion
+          title="Módulo 2 - Excel básico"
+          statusLabel="Finalizado"
+          lessons={[
+            {
+              id: '1',
+              title: 'Aula #01 - O que são planilhas',
+              status: 'finished',
+            },
+            {
+              id: '2',
+              title: 'Aula #02 - O que são planilhas',
+              status: 'finished',
+            },
+            {
+              id: '3',
+              title: 'Aula #03 - O que são planilhas',
+              status: 'view',
+            },
+          ]}
+          lessonSelectedId="3"
+          onLessonClick={(l) => console.log('Abrir aula: ', l)}
+          mode="edit"
+          moduleId="module-1"
+        />
+      </div>
     </div>
   );
 }

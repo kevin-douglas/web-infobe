@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type ComponentProps, type MouseEvent } from 'react';
+import { type ComponentProps, forwardRef, type MouseEvent } from 'react';
 import { Icon } from '@iconify/react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
