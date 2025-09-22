@@ -295,7 +295,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Tooltip>
         </aside>
 
-        <div className="flex h-full w-full flex-1 flex-col items-start gap-10 overflow-y-auto bg-gray-50 p-8">
+        <div className="flex h-full w-full flex-1 flex-col items-start gap-10 overflow-y-auto bg-white p-8">
           {children}
         </div>
       </section>

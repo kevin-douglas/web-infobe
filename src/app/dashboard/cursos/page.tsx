@@ -1,13 +1,18 @@
 'use client';
 
+import Button from '@/components/Button';
+
 import { useSession } from 'next-auth/react';
 import { CardSession } from '@/components/Cards/card-session';
 import { Heading } from '@/components/Typography/Heading';
+import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const { data: session, status } = useSession();
+
+  const router = useRouter();
 
   if (status === 'loading') {
     return <div className="p-4">Carregando...</div>;
@@ -39,12 +44,25 @@ export default function Page() {
   ];
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-col gap-3">
-        <Heading type="H1">O que você quer aprender hoje?</Heading>
-        <Heading type="H2" className="text-black-80">
-          Tem sempre algo novo esperando por você
-        </Heading>
+    <div className="flex w-full flex-col gap-12">
+      <div className="flex w-full flex-col justify-between gap-4 sm:flex-row md:items-center">
+        <div className="flex flex-col gap-3">
+          <Heading type="H1">O que você quer aprender hoje?</Heading>
+          <Heading type="H2" className="text-black-80">
+            Tem sempre algo novo esperando por você
+          </Heading>
+        </div>
+
+        {session.role === 'ADMIN' && (
+          <Button
+            withIcon
+            leftIcon="tabler:plus"
+            className="tablet:w-[220px] w-[190px]"
+            onClick={() => router.push('/dashboard/cursos/novo')}
+          >
+            Novo curso
+          </Button>
+        )}
       </div>
       <CardSession items={items} title="Seus cursos" more />
       <CardSession items={items} title="Cursos recomendados" more />
