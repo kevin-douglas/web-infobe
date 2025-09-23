@@ -1,43 +1,27 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { CardSession } from '@/components/Cards/card-session';
+import { useRouter } from 'next/navigation';
 import { Heading } from '@/components/Typography/Heading';
-import ModuleAccordion from '@/components/Accordion/module-accordion';
+import { CardSession } from '@/components/Cards/card-session';
+import { formatMinutes } from '@/app/utils/format-minutes';
+import {
+  useMyCourses,
+  useRecommendedCourses,
+} from '@/@core/course/service/course.service';
 
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
-  if (status === 'loading') {
-    return <div className="p-4">Carregando...</div>;
-  }
+  const { items: myCourses } = useMyCourses();
 
-  if (!session) {
-    return <div className="p-4">Não autenticado</div>;
-  }
+  const { items: recommendedCourses } = useRecommendedCourses();
 
-  const items = [
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-  ];
+  if (status === 'loading') return <div className="p-4">Carregando...</div>;
+  if (!session) return <div className="p-4">Não autenticado</div>;
 
   return (
     <div className="flex flex-col gap-12">
@@ -47,35 +31,36 @@ export default function Page() {
           Tem sempre algo novo esperando por você
         </Heading>
       </div>
-      <CardSession items={items} title="Seus cursos" more />
-      <CardSession items={items} title="Cursos recomendados" more />
-      <div className="mx-auto w-full p-6">
-        <ModuleAccordion
-          title="Módulo 2 - Excel básico"
-          statusLabel="Finalizado"
-          lessons={[
-            {
-              id: '1',
-              title: 'Aula #01 - O que são planilhas',
-              status: 'finished',
-            },
-            {
-              id: '2',
-              title: 'Aula #02 - O que são planilhas',
-              status: 'finished',
-            },
-            {
-              id: '3',
-              title: 'Aula #03 - O que são planilhas',
-              status: 'view',
-            },
-          ]}
-          lessonSelectedId="3"
-          onLessonClick={(l) => console.log('Abrir aula: ', l)}
-          mode="edit"
-          moduleId="module-1"
+
+      {!!myCourses.length && (
+        <CardSession
+          title="Seus cursos"
+          more
+          items={myCourses.map((i) => ({
+            imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+            imageAlt: i.name,
+            title: i.name,
+            courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+            onClick: () => router.push(`/dashboard/cursos/${i.id}`),
+            buttonText: 'Ver curso',
+          }))}
         />
-      </div>
+      )}
+
+      {!!recommendedCourses.length && (
+        <CardSession
+          title="Cursos recomendados"
+          more
+          items={recommendedCourses.map((i) => ({
+            imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+            imageAlt: i.name,
+            title: i.name,
+            courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+            onClick: () => router.push(`/dashboard/cursos/${i.id}`),
+            buttonText: 'Ver curso',
+          }))}
+        />
+      )}
     </div>
   );
 }

@@ -22,10 +22,8 @@ export const CardSession = ({
   more,
   loadAll = false,
 }: CardSessionProps) => {
-  // começa mostrando tudo se loadAll=true
   const [showAll, setShowAll] = React.useState<boolean>(loadAll);
 
-  // se o prop mudar depois, mantém em sincronia
   React.useEffect(() => {
     setShowAll(loadAll);
   }, [loadAll]);
@@ -42,7 +40,7 @@ export const CardSession = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <Heading type="H2">{title}</Heading>
+        {title && <Heading type="H2">{title}</Heading>}
 
         {canShowMore && (
           <Heading

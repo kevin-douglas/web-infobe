@@ -22,6 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               icon: 'tabler:home',
               title: 'Início',
               path: PATHS_ROUTE.DASHBOARD.HOME,
+              exact: true,
             },
             {
               icon: 'hugeicons:course',
