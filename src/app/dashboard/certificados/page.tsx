@@ -36,7 +36,13 @@ export default function Page() {
       imageAlt: `Certificado - ${c.course_name}`,
       title: c.course_name,
       courseName: `Emitido em ${formatPtBRDate(c.issued_at)}`,
-      onClick: () => window.open(url, '_blank'),
+      onClick: () => {
+        const token = session?.accessToken;
+        if (token) {
+          const pdfUrl = `/api/certificado/pdf?id=${c.id}&token=${token}`;
+          window.open(pdfUrl, '_blank');
+        }
+      },
       buttonText: 'Ver certificado',
     };
   });
