@@ -38,13 +38,19 @@ export async function POST(request: NextRequest) {
     // Criar resposta com cookie da sessão
     const response = NextResponse.json({ success: true });
 
-    response.cookies.set('next-auth.session-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 2, // 2 dias
-      path: '/',
-    });
+    response.cookies.set(
+      process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token',
+      token,
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 2, // 2 dias
+        path: '/',
+      },
+    );
 
     return response;
   } catch (error) {
