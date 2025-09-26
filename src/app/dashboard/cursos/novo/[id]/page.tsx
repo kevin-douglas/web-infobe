@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ModuleAccordion, {
   Lesson,
 } from '@/components/Accordion/module-accordion';
+import { NoContent } from '@/components/NoContent/no-content';
 
 interface CourseId {
   course: {
@@ -264,11 +265,7 @@ export default function NovoCursoPage() {
 
           <div className="flex h-full w-full flex-col gap-4">
             {modules.length === 0 && (
-              <div className="flex h-[363px] w-full items-center justify-center gap-6 rounded-2xl border border-dashed border-primary-20 bg-alpha-primary-100">
-                <Heading type="H2" className="text-primary-100">
-                  Os módulos aparecerão aqui
-                </Heading>
-              </div>
+              <NoContent message="Os módulos aparecerão aqui" />
             )}
             {modules.map((module) => (
               <ModuleAccordion

@@ -56,13 +56,6 @@ export default function Page() {
         </Heading>
       </div>
 
-      {/* feedbacks (opcionais) */}
-      {isLoading && (
-        <div className="grid gap-6">
-          <div className="h-6 w-64 animate-pulse rounded bg-black/10" />
-          <div className="h-40 w-full animate-pulse rounded-xl bg-black/10" />
-        </div>
-      )}
       {error && (
         <div className="text-sm text-red-500">
           Não foi possível carregar seus certificados.

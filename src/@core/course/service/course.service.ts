@@ -192,8 +192,12 @@ export async function markLessonCompleted(id: string) {
   return swrApiPost(`/lesson/${id}/complete`);
 }
 
-export async function generateCertificate(id: string) {
-  return swrApiPost(`/certificate/issue`, {
-    course_id: id,
-  });
+export async function generateCertificate(courseId: string): Promise<string> {
+  const { certificate } = await swrApiPost<{ certificate: { id: string } }>(
+    '/certificate/issue',
+    {
+      course_id: courseId,
+    },
+  );
+  return certificate.id;
 }

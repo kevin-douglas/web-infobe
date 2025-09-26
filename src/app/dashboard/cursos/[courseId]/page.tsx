@@ -121,12 +121,21 @@ export default function Page() {
 
                   <Button
                     onClick={async () => {
-                      await generateCertificate(courseId);
-                      mutateCourse();
-                      const token = session?.accessToken;
-                      if (token) {
-                        const pdfUrl = `/api/certificado/pdf?id=${courseId}&token=${token}`;
-                        window.open(pdfUrl, '_blank');
+                      try {
+                        const certId = await generateCertificate(courseId);
+                        await mutateCourse();
+                        if (!certId)
+                          throw new Error(
+                            'certificateId não veio no summary após emitir',
+                          );
+
+                        const token = session?.accessToken;
+                        if (token) {
+                          const pdfUrl = `/api/certificado/pdf?id=${certId}&token=${token}`;
+                          window.open(pdfUrl, '_blank');
+                        }
+                      } catch (e) {
+                        console.error(e);
                       }
                     }}
                     tone="neutral"
@@ -167,30 +176,32 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
-            <div className="flex flex-col gap-3">
-              <Heading type="H3" className="text-center">
-                Últimas aulas
-              </Heading>
-
+          {courseData.recentLessons.length > 0 && !summary.hasCertificate && (
+            <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
               <div className="flex flex-col gap-3">
-                {courseData.recentLessons.map((lesson) => (
-                  <div className="flex flex-col gap-2" key={lesson.id}>
-                    <div className="flex items-center justify-between gap-2">
-                      <Paragraph type="P2" className="text-primary-200">
-                        {lesson.name}
-                      </Paragraph>
-                      <Paragraph type="P2" className="text-black-80">
-                        {lesson.percent}%
-                      </Paragraph>
-                    </div>
+                <Heading type="H3" className="text-center">
+                  Últimas aulas
+                </Heading>
 
-                    <ProgressAnimation value={lesson.percent} />
-                  </div>
-                ))}
+                <div className="flex flex-col gap-3">
+                  {courseData.recentLessons.map((lesson) => (
+                    <div className="flex flex-col gap-2" key={lesson.id}>
+                      <div className="flex items-center justify-between gap-2">
+                        <Paragraph type="P2" className="text-primary-200">
+                          {lesson.name}
+                        </Paragraph>
+                        <Paragraph type="P2" className="text-black-80">
+                          {lesson.percent}%
+                        </Paragraph>
+                      </div>
+
+                      <ProgressAnimation value={lesson.percent} />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
