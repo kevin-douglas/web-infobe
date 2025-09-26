@@ -22,4 +22,8 @@ export const rules: MiddlewareRule[] = [
     match: (path) => path === '/dashboard' || path.startsWith('/dashboard/'),
     redirect: (session) => (session ? null : '/login'),
   },
+  {
+    match: (path) => path.startsWith('/dashboard/cursos/novo'),
+    redirect: (session) => (session?.role === 'ADMIN' ? null : '/login'),
+  },
 ];
