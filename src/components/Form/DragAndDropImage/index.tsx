@@ -1,10 +1,6 @@
 import React from 'react';
 
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from '@/components/ui/shadcn-io/dropzone';
+import { Dropzone } from '@/components/ui/shadcn-io/dropzone';
 import { Heading } from '@/components/Typography/Heading';
 import { Icon } from '@iconify/react';
 import { Paragraph } from '@/components/Typography/Paragraph';
@@ -34,11 +30,17 @@ const ContentDragAndDrop = ({ file }: { file?: File }) => {
   );
 };
 
-export const DragAndDropImage = () => {
-  const [files, setFiles] = React.useState<File[]>([]);
+interface DragAndDropImageProps {
+  file?: File;
+  setFile: (file?: File) => void;
+}
+
+export const DragAndDropImage: React.FC<DragAndDropImageProps> = ({
+  file,
+  setFile,
+}) => {
   const handleDrop = (files: File[]) => {
-    console.log(files);
-    setFiles(files);
+    if (files.length !== 0) setFile(files[0]);
   };
 
   return (
@@ -54,10 +56,10 @@ export const DragAndDropImage = () => {
         minSize={1024}
         onDrop={handleDrop}
         onError={console.error}
-        src={files}
+        src={file ? [file] : []}
         className="relative h-[191px] rounded-2xl border-dashed bg-alpha-primary-100"
       >
-        <ContentDragAndDrop file={files?.length !== 0 ? files[0] : undefined} />
+        <ContentDragAndDrop file={file ? file : undefined} />
       </Dropzone>
     </div>
   );

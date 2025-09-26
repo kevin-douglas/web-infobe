@@ -12,6 +12,7 @@ api.interceptors.request.use(
   async (config) => {
     try {
       const session = await getSession();
+
       if (session?.accessToken && config.headers) {
         (config.headers as Record<string, string>)['Authorization'] =
           `Bearer ${session.accessToken}`;

@@ -28,8 +28,8 @@ export interface ModuleAccordionProps {
   onLessonClick?: (lesson: Lesson) => void;
   lessonSelectedId?: string;
   mode: 'view' | 'edit';
-  onEditClick?: () => void;
-  onDeleteClick?: () => void;
+  onEditClick?: (lesson: Lesson) => void;
+  onDeleteClick?: (lesson: Lesson) => void;
   onAddLessonClick?: () => void;
 }
 
@@ -62,7 +62,7 @@ export default function ModuleAccordion({
           value={value}
           className={cn(
             'overflow-hidden',
-            'data-[state=open]:shadow-sm',
+            // 'data-[state=open]:border data-[state=open]:border-dashed',
             'rounded-sm',
           )}
         >
@@ -88,7 +88,7 @@ export default function ModuleAccordion({
             </div>
           </AccordionTrigger>
 
-          <AccordionContent className="px-2 pb-3 md:px-4 md:pb-4">
+          <AccordionContent className="border border-t-0 border-dashed px-2 pb-3 md:px-4 md:pb-4">
             <ul className="flex flex-col divide-y divide-border">
               {lessons.map((lesson) => (
                 <li key={lesson.id}>
@@ -141,7 +141,7 @@ export default function ModuleAccordion({
                           className="h-4 w-4 text-primary-100"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onEditClick?.();
+                            onEditClick?.(lesson);
                           }}
                         />
                         <Icon
@@ -149,7 +149,7 @@ export default function ModuleAccordion({
                           className="h-4 w-4 text-system-error"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onDeleteClick?.();
+                            onDeleteClick?.(lesson);
                           }}
                         />
                       </div>
@@ -162,6 +162,7 @@ export default function ModuleAccordion({
               <div className="mt-4 flex justify-end">
                 <Button
                   withIcon
+                  type="button"
                   leftIcon="tabler:plus"
                   className="tablet:w-[220px] w-[190px]"
                   onClick={onAddLessonClick}
