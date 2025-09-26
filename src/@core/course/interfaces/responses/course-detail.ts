@@ -34,6 +34,7 @@ export interface Summary {
   viewedLessons: number;
   completedLessons: number;
   hasCertificate: boolean;
+  certificateId?: string;
 }
 
 export interface RecentLesson {
