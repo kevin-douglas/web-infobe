@@ -106,7 +106,7 @@ export default function Page() {
 
         <div className="flex w-full flex-col gap-4">
           <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <Heading type="H3" className="text-center">
                 Progresso
               </Heading>
