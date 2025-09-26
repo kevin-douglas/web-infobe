@@ -11,12 +11,13 @@ interface CreateSessionData {
 export async function POST(request: NextRequest) {
   try {
     const data: CreateSessionData = await request.json();
-    
+
     const secret = process.env.NEXTAUTH_SECRET;
+
     if (!secret) {
       return NextResponse.json(
         { error: 'NEXTAUTH_SECRET não configurado' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -29,14 +30,14 @@ export async function POST(request: NextRequest) {
         role: data.role,
         accessToken: data.accessToken,
         iat: Math.floor(Date.now() / 1000), // issued at
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 2), // expires in 2 days
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 2, // expires in 2 days
       },
       secret,
     });
 
     // Criar resposta com cookie da sessão
     const response = NextResponse.json({ success: true });
-    
+
     response.cookies.set('next-auth.session-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     console.error('Erro ao criar sessão:', error);
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

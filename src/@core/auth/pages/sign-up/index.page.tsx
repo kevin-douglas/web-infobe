@@ -1,35 +1,43 @@
 'use client';
 
+import React from 'react';
 import Button from '@/components/Button';
 import Link from 'next/link';
 
 import { InputDefault } from '@/components/Form/Inputs/InputDefault';
 import { Heading } from '@/components/Typography/Heading';
 import { useForm } from 'react-hook-form';
-import { LoginForm, LoginFormSchema } from './login.validation';
+import { SignUpForm, SignUpFormSchema } from './sign-up.validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthService } from '../../service/auth.service';
 import { Paragraph } from '@/components/Typography/Paragraph';
+import { InputMask } from '@/components/Form/Inputs/InputMask';
 
-export const LoginPage: React.FC = () => {
+export const SignUpPage: React.FC = () => {
+  const [loading, setLoading] = React.useState<boolean>(false);
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setError,
     formState: { errors, isValid },
-  } = useForm<LoginFormSchema>({
-    resolver: zodResolver(LoginForm),
+  } = useForm<SignUpFormSchema>({
+    resolver: zodResolver(SignUpForm),
     mode: 'onChange',
   });
 
-  const servicePostLogin = async (form: LoginFormSchema) => {
+  const servicePostSignUp = async (form: SignUpFormSchema) => {
     try {
-      await AuthService.postLogin(form);
+      setLoading(() => true);
+      await AuthService.postSignUp(form);
       window.location.href = '/dashboard';
-    } catch (err) {
-      console.log({ err });
-      setError('password', { message: 'E-mail/senha incorretos' });
+    } catch (err: any) {
+      if (err.response?.data.message === 'Email already exists')
+        setError('email', { message: 'E-mail já em uso' });
+      else setError('password', { message: 'Erro ao cadastar' });
+    } finally {
+      setLoading(() => false);
     }
   };
 
@@ -38,7 +46,7 @@ export const LoginPage: React.FC = () => {
       <div className="flex h-dvh w-full flex-col gap-12 place-self-center px-6 py-8 lg:px-0 lg:pt-16">
         <form
           autoComplete="off"
-          onSubmit={handleSubmit(servicePostLogin)}
+          onSubmit={handleSubmit(servicePostSignUp)}
           className="flex h-full w-full max-w-[720px] flex-col gap-12 md:md:h-fit md:place-self-center lg:max-w-[468px]"
         >
           <Heading type="H1" className="text-[32px] text-primary-200">
@@ -46,10 +54,21 @@ export const LoginPage: React.FC = () => {
           </Heading>
 
           <div className="flex h-full w-full flex-col gap-6">
-            <Heading type="H1">Acessar conta</Heading>
+            <Heading type="H1">Cadastre-se</Heading>
 
             <div className="flex h-full w-full flex-col gap-6">
-              <InputDefault<LoginFormSchema>
+              <InputDefault<SignUpFormSchema>
+                id="name"
+                type="text"
+                label="Nome completo:"
+                placeholder="Digite seu nome"
+                register={register}
+                icon="tabler:user"
+                errorMessage={errors.name?.message}
+                hasValue={!!watch().name}
+              />
+
+              <InputDefault<SignUpFormSchema>
                 id="email"
                 type="email"
                 label="E-mail:"
@@ -60,7 +79,18 @@ export const LoginPage: React.FC = () => {
                 hasValue={!!watch().email}
               />
 
-              <InputDefault<LoginFormSchema>
+              <InputMask<SignUpFormSchema>
+                id="tax_identifier"
+                label="CPF:"
+                type="text"
+                placeholder="Digite seu CPF"
+                control={control}
+                icon="tabler:id"
+                mask="999.999.999-99"
+                errorMessage={errors.tax_identifier?.message}
+              />
+
+              <InputDefault<SignUpFormSchema>
                 id="password"
                 type="password"
                 label="Senha:"
@@ -73,10 +103,10 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <Link
-              href="/sign-up"
+              href="/login"
               className="w-fit place-self-end text-primary-100 underline"
             >
-              <Paragraph type="P2">Não tenho conta</Paragraph>
+              <Paragraph type="P2">Já tenho conta</Paragraph>
             </Link>
           </div>
 
@@ -85,8 +115,9 @@ export const LoginPage: React.FC = () => {
             leftIcon="tabler:logout"
             width="fill"
             disabled={!isValid}
+            loading={loading}
           >
-            Entrar
+            Cadastrar
           </Button>
         </form>
       </div>

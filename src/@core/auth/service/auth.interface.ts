@@ -5,6 +5,13 @@ export interface PostLoginProps {
 
 export interface PostLogin {
   accessToken: string;
-  role: "USER" | "ADMIN";
+  role: 'USER' | 'ADMIN';
   name: string;
+}
+
+export interface PostSignUpProps {
+  name: string;
+  email: string;
+  tax_identifier: string;
+  password: string;
 }

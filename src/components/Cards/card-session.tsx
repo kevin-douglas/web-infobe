@@ -63,6 +63,7 @@ export const CardSession = ({
             courseName={item.courseName}
             onClick={item.onClick}
             buttonText={item.buttonText}
+            leftIcon={item.leftIcon}
           />
         ))}
       </div>
