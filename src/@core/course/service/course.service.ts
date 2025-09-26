@@ -18,14 +18,19 @@ import type {
   MyCertificateItem,
   MyCertificatesResponse,
 } from '@/@core/course/interfaces/responses/certificates';
+import type { AxiosRequestConfig } from 'axios';
 
 const swrApiFetcher = async <T>(url: string): Promise<T> => {
   const res = await api.get<T>(url);
   return res.data;
 };
 
-const swrApiPost = async <T = never>(url: string): Promise<T> => {
-  const res = await api.post<T>(url);
+export const swrApiPost = async <T = never, B = unknown>(
+  url: string,
+  body?: B,
+  config?: AxiosRequestConfig,
+): Promise<T> => {
+  const res = await api.post<T>(url, body, config);
   return res.data;
 };
 
@@ -185,4 +190,10 @@ export async function markLessonViewed(id: string) {
 
 export async function markLessonCompleted(id: string) {
   return swrApiPost(`/lesson/${id}/complete`);
+}
+
+export async function generateCertificate(id: string) {
+  return swrApiPost(`/certificate/issue`, {
+    course_id: id,
+  });
 }
