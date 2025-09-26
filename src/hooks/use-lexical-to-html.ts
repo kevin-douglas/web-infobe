@@ -3,21 +3,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { $generateHtmlFromNodes } from '@lexical/html';
 import { createEditor, type SerializedEditorState } from 'lexical';
-
-// import { nodes } from '../components/blocks/editor-00/nodes';
-
-type LexicalJsonInput = string | SerializedEditorState;
-
-export function useLexicalToHtml(
-  lexicalJson: LexicalJsonInput | null | undefined,
-) {
+import { nodes } from '@/components/blocks/editor-00/nodes';
+export function useLexicalToHtml(lexicalJson: any) {
   const [htmlContent, setHtmlContent] = useState('');
 
   const editor = useMemo(
     () =>
       createEditor({
         namespace: 'LexicalToHTML',
-        // nodes: nodes,
+        nodes: nodes,
         onError: (e) => console.error('Lexical to HTML error:', e),
       }),
     [],

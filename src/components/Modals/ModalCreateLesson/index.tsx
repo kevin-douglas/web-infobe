@@ -11,6 +11,8 @@ import {
   CreateLessonFormSchema,
 } from './create-lesson.validation';
 import { Lesson } from '@/components/Accordion/module-accordion';
+import { EditorCustom } from '@/components/Form/EditorCustom';
+import { useLexicalToHtml } from '@/hooks/use-lexical-to-html';
 
 interface ModalCreateLessonProps {
   visible: boolean;
@@ -42,13 +44,15 @@ export const ModalCreateLesson: React.FC<ModalCreateLessonProps> = ({
     resolver: zodResolver(CreateLessonForm),
   });
 
+  const content = useLexicalToHtml(watch().description);
+
   const postCreateClassroom = async () => {
     try {
       if (lesson) {
         await api.patch('/lesson/' + lesson.id, {
           name: watch().name,
           module_id: module_id,
-          content: watch().description,
+          content: content,
         });
 
         onSuccess(
@@ -60,7 +64,7 @@ export const ModalCreateLesson: React.FC<ModalCreateLessonProps> = ({
         const { data } = await api.post('/lesson', {
           name: watch().name,
           module_id: module_id,
-          content: watch().description,
+          content: content,
         });
 
         onSuccess(
@@ -80,14 +84,19 @@ export const ModalCreateLesson: React.FC<ModalCreateLessonProps> = ({
     } else
       reset({
         name: '',
-        description: '',
+        description: undefined,
       });
   }, [visible]);
 
   return (
-    <ModalDefault visible={visible} onClose={onClose} title="Nova aula">
+    <ModalDefault
+      visible={visible}
+      onClose={onClose}
+      title="Nova aula"
+      className="sm:max-w-[780px]"
+    >
       <form
-        className="flex w-full flex-col gap-6 md:max-w-[380px]"
+        className="flex w-full flex-col gap-6"
         onSubmit={handleSubmit(postCreateClassroom)}
       >
         <InputDefault
@@ -100,14 +109,10 @@ export const ModalCreateLesson: React.FC<ModalCreateLessonProps> = ({
           errorMessage={errors.name?.message}
         />
 
-        <InputDefault
-          id="description"
-          label="Nome da aula:"
-          placeholder="Ex: Como utilizar fórmulas"
-          register={register}
-          icon="tabler:note"
-          hasValue={!!watch().description}
-          errorMessage={errors.description?.message}
+        <EditorCustom
+          onChangeValue={(value) =>
+            setValue('description', value, { shouldValidate: true })
+          }
         />
 
         <Button

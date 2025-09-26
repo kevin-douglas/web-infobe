@@ -4,6 +4,7 @@ import { Heading } from '@/components/Typography/Heading';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Icon } from '@iconify/react';
 import { DialogTitle } from '@radix-ui/react-dialog';
+import { cn } from '@/lib/utils';
 
 interface Props {
   visible: boolean;
@@ -11,6 +12,7 @@ interface Props {
 
   title: string;
   children: React.ReactNode;
+  className?: React.ComponentProps<'div'>['className'];
 }
 
 export const ModalDefault: React.FC<Props> = ({
@@ -18,11 +20,12 @@ export const ModalDefault: React.FC<Props> = ({
   onClose,
   title,
   children,
+  className,
 }) => {
   return (
     <Dialog open={visible}>
       <DialogContent
-        className="gap-8 px-6 sm:max-w-[425px]"
+        className={cn('gap-8 px-6 sm:max-w-[425px]', className)}
         showCloseButton={false}
       >
         <div className="relative flex w-full items-center justify-center">
