@@ -6,6 +6,7 @@ import { Heading } from '@/components/Typography/Heading';
 import { CardSession } from '@/components/Cards/card-session';
 import { formatMinutes } from '@/app/utils/format-minutes';
 import {
+  useAdminCourses,
   useMyCourses,
   useRecommendedCourses,
 } from '@/@core/course/service/course.service';
@@ -20,6 +21,8 @@ export default function Page() {
 
   const { items: recommendedCourses } = useRecommendedCourses();
 
+  const { items: adminCourses } = useAdminCourses('DRAFT', session?.role);
+
   if (status === 'loading') return <div className="p-4">Carregando...</div>;
   if (!session) return <div className="p-4">Não autenticado</div>;
 
@@ -31,6 +34,21 @@ export default function Page() {
           Tem sempre algo novo esperando por você
         </Heading>
       </div>
+
+      {!!adminCourses.length && session?.role === 'ADMIN' && (
+        <CardSession
+          title="Cursos pendentes de publicação"
+          more
+          items={adminCourses.map((i) => ({
+            imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+            imageAlt: i.name,
+            title: i.name,
+            courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+            onClick: () => router.push(`/dashboard/cursos/${i.id}`),
+            buttonText: 'Ver curso',
+          }))}
+        />
+      )}
 
       {!!myCourses.length && (
         <CardSession

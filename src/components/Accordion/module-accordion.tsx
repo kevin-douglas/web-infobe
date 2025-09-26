@@ -127,7 +127,7 @@ export default function ModuleAccordion({
                             className="h-4 w-4 text-system-success"
                           />
                         )}
-                        {lesson.id === lessonSelectedId && (
+                        {lesson.status === 'view' && (
                           <Icon
                             icon="tabler:eye"
                             className="h-4 w-4 text-primary-200"

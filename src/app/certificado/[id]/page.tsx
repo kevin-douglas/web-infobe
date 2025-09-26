@@ -49,6 +49,12 @@ export default function CertificatePage() {
     const fetchCertificateData = async () => {
       try {
         if (!accessToken) {
+          setCertificateData({
+            studentName: 'João da Silva',
+            cpf: '123.456.789-00',
+            courseName: 'Curso de Teste',
+            issueDate: formatDate(new Date().toISOString()),
+          });
           setDataLoaded(true);
           return;
         }
@@ -77,6 +83,12 @@ export default function CertificatePage() {
         setCertificateData(formattedData);
         setDataLoaded(true);
       } catch (error) {
+        setCertificateData({
+          studentName: 'João da Silva',
+          cpf: '123.456.789-00',
+          courseName: 'Curso de Teste',
+          issueDate: formatDate(new Date().toISOString()),
+        });
         setDataLoaded(true);
       } finally {
         setLoading(false);

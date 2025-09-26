@@ -7,7 +7,10 @@ import { Paragraph } from '@/components/Typography/Paragraph';
 import ProgressAnimation from '@/components/Progress/progress-animation';
 import { Icon } from '@iconify/react';
 import ModuleAccordion from '@/components/Accordion/module-accordion';
-import { useCourseById } from '@/@core/course/service/course.service';
+import {
+  markLessonViewed,
+  useCourseById,
+} from '@/@core/course/service/course.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,6 +53,14 @@ export default function Page() {
     (l) => l.status === 'view',
   )?.id;
 
+  const verifyHasLessonCompleted = (modId: string) => {
+    const mod = modules.find((m) => m.id === modId);
+    if (!mod) return false;
+    return mod.lessons.some(
+      (lesson) => lesson.status === 'view' || lesson.status === 'finished',
+    );
+  };
+
   return (
     <div className="flex w-full flex-col gap-12">
       <div className="flex flex-col gap-3">
@@ -71,46 +82,79 @@ export default function Page() {
             <ModuleAccordion
               key={module.id}
               title={module.name}
-              statusLabel={module.finished ? 'Finalizado' : 'Em progresso'}
+              statusLabel={
+                module.finished
+                  ? 'Finalizado'
+                  : verifyHasLessonCompleted(module.id)
+                    ? 'Em progresso'
+                    : 'Não iniciado'
+              }
               lessons={module.lessons.map((lesson) => ({
                 id: lesson.id,
                 title: lesson.name,
                 status: lesson.status,
               }))}
-              lessonSelectedId={firstViewingLessonId}
-              onLessonClick={(l) =>
-                router.push(`/dashboard/cursos/${courseId}/aula/${l.id}`)
-              }
+              onLessonClick={async (l) => {
+                await markLessonViewed(l.id);
+                router.push(`/dashboard/cursos/${courseId}/aula/${l.id}`);
+              }}
               mode="view"
               moduleId={module.id}
             />
           ))}
         </div>
 
-        <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
-          <div className="flex flex-col gap-3">
-            <Heading type="H3" className="text-center">
-              Progresso
-            </Heading>
-
+        <div className="flex w-full flex-col gap-4">
+          <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
             <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
-                  <Paragraph type="P2" className="text-primary-200">
-                    {summary.completedLessons}/{summary.totalLessons} aulas
-                  </Paragraph>
-                  <Paragraph type="P2" className="text-black-80">
-                    {summary.completedLessons === summary.totalLessons
-                      ? 'Concluído'
-                      : 'Em progresso'}
-                  </Paragraph>
-                </div>
+              <Heading type="H3" className="text-center">
+                Progresso
+              </Heading>
 
-                <ProgressAnimation
-                  value={Math.round(
-                    (summary.completedLessons / summary.totalLessons) * 100,
-                  )}
-                />
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <Paragraph type="P2" className="text-primary-200">
+                      {summary.completedLessons}/{summary.totalLessons} aulas
+                    </Paragraph>
+                    <Paragraph type="P2" className="text-black-80">
+                      {summary.completedLessons === summary.totalLessons
+                        ? 'Concluído'
+                        : 'Em progresso'}
+                    </Paragraph>
+                  </div>
+
+                  <ProgressAnimation
+                    value={Math.round(
+                      (summary.completedLessons / summary.totalLessons) * 100,
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
+            <div className="flex flex-col gap-3">
+              <Heading type="H3" className="text-center">
+                Últimas aulas
+              </Heading>
+
+              <div className="flex flex-col gap-3">
+                {courseData.recentLessons.map((lesson) => (
+                  <div className="flex flex-col gap-2" key={lesson.id}>
+                    <div className="flex items-center justify-between gap-2">
+                      <Paragraph type="P2" className="text-primary-200">
+                        {lesson.name}
+                      </Paragraph>
+                      <Paragraph type="P2" className="text-black-80">
+                        {lesson.percent}%
+                      </Paragraph>
+                    </div>
+
+                    <ProgressAnimation value={lesson.percent} />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

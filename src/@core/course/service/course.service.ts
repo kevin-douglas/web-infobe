@@ -24,6 +24,11 @@ const swrApiFetcher = async <T>(url: string): Promise<T> => {
   return res.data;
 };
 
+const swrApiPost = async <T = never>(url: string): Promise<T> => {
+  const res = await api.post<T>(url);
+  return res.data;
+};
+
 const keys = {
   course: (id: string) => ['course', id] as const,
   lesson: (id: string) => ['lesson', id] as const,
@@ -31,6 +36,7 @@ const keys = {
   recommendedCourses: ['course', 'user', 'recommended'] as const,
   myCourses: ['course', 'user', 'my-courses'] as const,
   myCertificates: ['course', 'user', 'my-certificates'] as const,
+  adminCoureses: ['course', 'admin', 'all'] as const,
 };
 
 export function useCourseById(
@@ -133,4 +139,50 @@ export function useMyCertificates(
 
   const items = (data ?? []) as MyCertificateItem[];
   return { data, items, error, isLoading, mutate };
+}
+
+export function useAdminCourses(
+  status?: 'DRAFT' | 'PUBLISHED',
+  role: string = 'USER',
+  config?: SWRConfiguration<RecommendedCourseResponse>,
+) {
+  const query = status ? `?status=${status}` : '';
+
+  const isAdmin = role === 'ADMIN';
+
+  const { data, error, isLoading, mutate } = useSWR<RecommendedCourseResponse>(
+    isAdmin
+      ? status
+        ? [...keys.adminCoureses, status]
+        : keys.adminCoureses
+      : null,
+    () => swrApiFetcher<RecommendedCourseResponse>(`/course/admin/all${query}`),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+      ...config,
+    },
+  );
+
+  const items = (data ?? []) as RecommendedCourseItem[];
+
+  if (!isAdmin) {
+    return {
+      data: undefined,
+      items: [],
+      error: undefined,
+      isLoading: false,
+      mutate: () => {},
+    };
+  }
+
+  return { data, items, error, isLoading, mutate };
+}
+
+export async function markLessonViewed(id: string) {
+  return swrApiPost(`/lesson/${id}/view`);
+}
+
+export async function markLessonCompleted(id: string) {
+  return swrApiPost(`/lesson/${id}/complete`);
 }
