@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Heading } from '@/components/Typography/Heading';
 import { CardSession } from '@/components/Cards/card-session';
-import { formatMinutes } from '@/app/utils/format-minutes';
 import {
   useRecentLessons,
   useRecommendedCourses,
@@ -72,7 +71,7 @@ export default function Page() {
             imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
             imageAlt: i.name,
             title: i.name,
-            courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+            courseName: `${i.totalLessons} aulas`,
             onClick: () => router.push(`/dashboard/cursos/${i.id}`),
             buttonText: 'Ver curso',
           }))}
