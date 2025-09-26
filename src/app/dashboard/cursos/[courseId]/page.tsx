@@ -8,9 +8,11 @@ import ProgressAnimation from '@/components/Progress/progress-animation';
 import { Icon } from '@iconify/react';
 import ModuleAccordion from '@/components/Accordion/module-accordion';
 import {
+  generateCertificate,
   markLessonViewed,
   useCourseById,
 } from '@/@core/course/service/course.service';
+import Button from '@/components/Button';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +26,7 @@ export default function Page() {
     data: courseData,
     isLoading,
     error,
+    mutate: mutateCourse,
   } = useCourseById(courseId, {
     revalidateOnFocus: false,
     dedupingInterval: 5000,
@@ -48,10 +51,6 @@ export default function Page() {
   }
 
   const { course, modules, summary } = courseData;
-
-  const firstViewingLessonId = modules?.[0]?.lessons.find(
-    (l) => l.status === 'view',
-  )?.id;
 
   const verifyHasLessonCompleted = (modId: string) => {
     const mod = modules.find((m) => m.id === modId);
@@ -105,6 +104,40 @@ export default function Page() {
         </div>
 
         <div className="flex w-full flex-col gap-4">
+          {!summary.hasCertificate &&
+            summary.completedLessons === summary.totalLessons && (
+              <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-2">
+                    <Heading type="H1" className="text-center text-primary-200">
+                      Parabéns!
+                    </Heading>
+
+                    <Paragraph type="P2" className="text-center text-black-80">
+                      Você concluiu este curso e poderá emitir seu certificado
+                      através do botão abaixo.
+                    </Paragraph>
+                  </div>
+
+                  <Button
+                    onClick={async () => {
+                      await generateCertificate(courseId);
+                      mutateCourse();
+                      const token = session?.accessToken;
+                      if (token) {
+                        const pdfUrl = `/api/certificado/pdf?id=${courseId}&token=${token}`;
+                        window.open(pdfUrl, '_blank');
+                      }
+                    }}
+                    tone="neutral"
+                    width="fill"
+                  >
+                    Emitir Certificado
+                  </Button>
+                </div>
+              </div>
+            )}
+
           <div className="w-full rounded-[12px] border-[3px] border-dashed p-6 lg:max-w-[380px] lg:self-start">
             <div className="flex flex-col gap-2">
               <Heading type="H3" className="text-center">
