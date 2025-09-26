@@ -3,13 +3,15 @@
 import { DashboardLayout } from '@/components/Layouts/dashboard.layout';
 import { PATHS_ROUTE } from '@/app/constants/paths-route.constants';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const handleLogout = async () => {
     await signOut({
-      callbackUrl: '/login',
-      redirect: true,
+      redirect: false,
     });
+    router.push('/login');
   };
 
   return (
@@ -22,6 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               icon: 'tabler:home',
               title: 'Início',
               path: PATHS_ROUTE.DASHBOARD.HOME,
+              exact: true,
             },
             {
               icon: 'hugeicons:course',

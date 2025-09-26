@@ -3,6 +3,7 @@ import React from 'react';
 import { Heading } from '@/components/Typography/Heading';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Icon } from '@iconify/react';
+import { DialogTitle } from '@radix-ui/react-dialog';
 
 interface Props {
   visible: boolean;
@@ -25,9 +26,11 @@ export const ModalDefault: React.FC<Props> = ({
         showCloseButton={false}
       >
         <div className="relative flex w-full items-center justify-center">
-          <Heading type="H2" className="flex w-full justify-center">
-            {title}
-          </Heading>
+          <DialogTitle asChild>
+            <Heading type="H2" className="flex w-full justify-center">
+              {title}
+            </Heading>
+          </DialogTitle>
 
           <Icon
             icon="basil:cross-outline"

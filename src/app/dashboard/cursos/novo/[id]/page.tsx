@@ -8,9 +8,12 @@ import { ModalCreateLesson } from '@/components/Modals/ModalCreateLesson';
 import { Heading } from '@/components/Typography/Heading';
 import { api } from '@/service/index.service';
 import { Icon } from '@iconify/react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { ModalCreateModule } from '@/components/Modals/ModalCreateModule';
+import { DragAndDropImage } from '@/components/Form/DragAndDropImage';
+import { CreateCourseForm } from '@/components/Modals/ModalCreateCourse/create-course.validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import ModuleAccordion, {
   Lesson,
@@ -24,6 +27,7 @@ interface CourseId {
     created_at: string;
     updated_at: string;
     cover_url: string;
+    status: 'DRAFT' | 'PUBLISHED';
   };
   modules: {
     name: string;
@@ -43,9 +47,38 @@ interface LessonModule {
   lesson?: Lesson;
 }
 
+async function urlToFile(url: string, filename?: string): Promise<File> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  const mimeType = blob.type;
+  const extension = mimeType.split('/')[1] || 'png';
+
+  return new File([blob], filename ?? `file.${extension}`, { type: mimeType });
+}
+
 export default function NovoCursoPage() {
   const { id } = useParams();
-  const { register } = useForm();
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    getValues,
+  } = useForm({
+    mode: 'onChange',
+    resolver: zodResolver(CreateCourseForm),
+  });
+
+  const router = useRouter();
+
+  const lastSubmitted = React.useRef(getValues());
+
+  const values = watch();
+
+  const hasChangedSinceSubmit =
+    JSON.stringify(values) !== JSON.stringify(lastSubmitted.current);
 
   const [modalCreateClassroom, setModalCreateClassroom] =
     React.useState<boolean>(false);
@@ -56,6 +89,8 @@ export default function NovoCursoPage() {
   const [modules, setModules] = React.useState<CourseId['modules']>([]);
 
   const [lessonModule, setLessonModule] = React.useState<LessonModule>();
+
+  const isPublished = course?.course.status === 'PUBLISHED';
 
   const openModalCreateLesson = (module_id: string, lesson?: Lesson) => {
     setLessonModule(() => ({
@@ -99,7 +134,45 @@ export default function NovoCursoPage() {
       if (data) {
         setCourse(() => data);
         setModules(() => data.modules);
+
+        setValue('course_name', data.course.name);
+
+        const getFile = await urlToFile(
+          process.env.NEXT_PUBLIC_API_URL + '/upload/' + data.course.cover_key,
+        );
+
+        if (getFile) setValue('file', getFile);
       }
+    } catch (err) {
+      console.log({ err });
+    }
+  };
+
+  const patchCourse = async () => {
+    try {
+      lastSubmitted.current = watch();
+
+      let cover_key = course?.course.cover_key || '';
+
+      if (watch().editable) {
+        const formData = new FormData();
+
+        formData.append('file', watch().file);
+        formData.append('type', 'COVER');
+
+        const { data } = await api.post('/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        cover_key = data.key;
+      }
+
+      await api.patch('/course/' + id, {
+        name: watch().course_name,
+        cover_key,
+      });
     } catch (err) {
       console.log({ err });
     }
@@ -108,6 +181,7 @@ export default function NovoCursoPage() {
   const patchCourseStatus = async () => {
     try {
       await api.patch('/course/' + id + '/publish');
+      router.push('/dashboard/cursos/' + id);
     } catch (err) {
       console.log({ err });
     }
@@ -129,38 +203,61 @@ export default function NovoCursoPage() {
               />
 
               <Heading type="H1" className="text-black-100">
-                Novo curso
+                {isPublished ? 'Editando' : 'Novo'}{' '}
+                <span className="text-primary-200">curso</span>
               </Heading>
             </div>
 
             <Heading type="H2" className="text-black-80">
-              Adicione novos cursos à plataforma
+              {isPublished
+                ? 'Modifique os detalhes deste curso'
+                : 'Adicione novos cursos à plataforma'}
             </Heading>
           </div>
 
-          <Button
-            withIcon
-            leftIcon="material-symbols:check"
-            className="tablet:w-[220px] w-[190px]"
-            onClick={() => patchCourseStatus()}
-          >
-            Publicar
-          </Button>
+          {!isPublished && (
+            <Button
+              withIcon
+              leftIcon="material-symbols:check"
+              className="tablet:w-[220px] w-[190px]"
+              onClick={() => patchCourseStatus()}
+            >
+              Publicar
+            </Button>
+          )}
         </div>
 
-        <form className="flex h-full w-full flex-col gap-12 md:flex-row-reverse">
+        <form
+          className="flex h-full w-full flex-col gap-12 md:flex-row-reverse"
+          onSubmit={handleSubmit(patchCourse)}
+        >
           <div className="flex w-full flex-col gap-6 md:max-w-[380px]">
             <InputDefault
               id="course_name"
               label="Nome do curso:"
               placeholder="Digite o nome do curso..."
               register={register}
-              icon="hugeicons:course"
+              icon="tabler:note"
+              hasValue={!!watch().course_name}
+              errorMessage={errors.course_name?.message}
             />
 
-            {/* <DragAndDropImage /> */}
+            <DragAndDropImage
+              file={watch().file}
+              setFile={(newFile) => {
+                if (newFile)
+                  setValue('file', newFile, { shouldValidate: true });
 
-            <Button withIcon leftIcon="fluent:edit-24-regular" width="fill">
+                setValue('editable', true);
+              }}
+            />
+
+            <Button
+              withIcon
+              leftIcon="fluent:edit-24-regular"
+              width="fill"
+              disabled={!isValid || !hasChangedSinceSubmit}
+            >
               Atualizar curso
             </Button>
           </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 import { Dropzone } from '@/components/ui/shadcn-io/dropzone';
 import { Heading } from '@/components/Typography/Heading';
@@ -7,11 +8,12 @@ import { Paragraph } from '@/components/Typography/Paragraph';
 
 const ContentDragAndDrop = ({ file }: { file?: File }) => {
   return file ? (
-    <div
-      className="absolute top-0 right-0 bottom-0 left-0 w-full rounded-2xl bg-contain bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `url(${URL.createObjectURL(file)})`,
-      }}
+    <Image
+      alt={file.name}
+      fill
+      className="object-contain object-center"
+      sizes="(max-width: 404px) 100vw, 404px"
+      {...(file && { src: URL.createObjectURL(file) })}
     />
   ) : (
     <div className="flex flex-col items-center gap-2.5">
@@ -56,8 +58,8 @@ export const DragAndDropImage: React.FC<DragAndDropImageProps> = ({
         minSize={1024}
         onDrop={handleDrop}
         onError={console.error}
-        src={file ? [file] : []}
         className="relative h-[191px] rounded-2xl border-dashed bg-alpha-primary-100"
+        src={file ? [file] : []}
       >
         <ContentDragAndDrop file={file ? file : undefined} />
       </Dropzone>

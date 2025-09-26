@@ -22,6 +22,7 @@ interface Step {
     path: string;
     hidden?: boolean;
     sub_paths?: string[];
+    exact?: boolean;
   }[];
 }
 
@@ -29,6 +30,28 @@ interface DashboardLayoutProps {
   list: Step[];
   children: React.ReactNode;
   onLogout?: () => void;
+}
+
+const strip = (s = '') => s.replace(/\/+$/, '');
+
+function isRouteActive(
+  pathname: string,
+  r: { path: string; sub_paths?: string[]; exact?: boolean },
+) {
+  const p = strip(pathname);
+  const base = strip(r.path);
+
+  if (r.exact) return p === base; // 👈 Home usa isso
+  if (p === base) return true;
+  if (p.startsWith(base + '/')) return true;
+
+  if (r.sub_paths?.length) {
+    return r.sub_paths.some((sp) => {
+      const s = strip(sp);
+      return p === s || p.startsWith(s + '/');
+    });
+  }
+  return false;
 }
 
 function SidebarList({
@@ -65,9 +88,7 @@ function SidebarList({
             {s.routes
               .filter((r) => !r.hidden)
               .map((r) => {
-                const isActive =
-                  pathname === r.path ||
-                  (r.sub_paths && r.sub_paths.includes(pathname));
+                const isActive = isRouteActive(pathname, r);
 
                 const linkEl = (
                   <Link
@@ -143,9 +164,8 @@ function MobileBottomBar({
     >
       <ul className="flex items-center justify-center">
         {routes.map((r) => {
-          const isActive =
-            pathname === r.path ||
-            (r.sub_paths && r.sub_paths.includes(pathname));
+          const isActive = isRouteActive(pathname, r);
+
           return (
             <li key={r.title}>
               <Link

@@ -23,6 +23,7 @@ export type LessonCardProps = {
   onClick?: () => void;
   buttonText?: string;
   className?: string;
+  leftIcon?: string;
 };
 
 export function LessonCard({
@@ -33,6 +34,7 @@ export function LessonCard({
   onClick,
   buttonText = 'Acessar aula',
   className,
+  leftIcon,
 }: LessonCardProps) {
   return (
     <Card
@@ -64,7 +66,7 @@ export function LessonCard({
       <CardFooter className="pb-6">
         <Button
           withIcon
-          leftIcon="tabler:external-link"
+          leftIcon={leftIcon || 'tabler:external-link'}
           width="fill"
           onClick={onClick}
         >

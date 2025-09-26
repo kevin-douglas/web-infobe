@@ -2,49 +2,36 @@
 
 import React from 'react';
 import Button from '@/components/Button';
-import ModuleAccordion from '@/components/Accordion/module-accordion';
 
 import { useSession } from 'next-auth/react';
-import { CardSession } from '@/components/Cards/card-session';
+import { useRouter } from 'next/navigation';
 import { Heading } from '@/components/Typography/Heading';
 import { ModalCreateCourse } from '@/components/Modals/ModalCreateCourse';
+import { CardSession } from '@/components/Cards/card-session';
+import { formatMinutes } from '@/app/utils/format-minutes';
+import {
+  useAdminCourses,
+  useMyCourses,
+  useRecommendedCourses,
+} from '@/@core/course/service/course.service';
 
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const [modalCreateCourse, setModalCreateCourse] =
     React.useState<boolean>(false);
 
-  if (status === 'loading') {
-    return <div className="p-4">Carregando...</div>;
-  }
+  const { items: myCourses } = useMyCourses();
 
-  if (!session) {
-    return <div className="p-4">Não autenticado</div>;
-  }
+  const { items: recommendedCourses } = useRecommendedCourses();
 
-  const items = [
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-    {
-      imageUrl: 'https://placehold.co/600x400.png',
-      imageAlt: 'Planilha de Excel aberta em um notebook',
-      title: 'Aula 04 - Como utilizar fórmulas',
-      courseName: 'Curso de Excel básico',
-    },
-  ];
+  const { items: adminCourses } = useAdminCourses('DRAFT', session?.role);
+
+  if (status === 'loading') return <div className="p-4">Carregando...</div>;
+  if (!session) return <div className="p-4">Não autenticado</div>;
 
   return (
     <>
@@ -68,35 +55,52 @@ export default function Page() {
             </Button>
           )}
         </div>
-        <CardSession items={items} title="Seus cursos" more />
-        <CardSession items={items} title="Cursos recomendados" more />
-        <div className="mx-auto w-full p-6">
-          <ModuleAccordion
-            title="Módulo 2 - Excel básico"
-            statusLabel="Finalizado"
-            lessons={[
-              {
-                id: '1',
-                title: 'Aula #01 - O que são planilhas',
-                status: 'finished',
-              },
-              {
-                id: '2',
-                title: 'Aula #02 - O que são planilhas',
-                status: 'finished',
-              },
-              {
-                id: '3',
-                title: 'Aula #03 - O que são planilhas',
-                status: 'view',
-              },
-            ]}
-            lessonSelectedId="3"
-            onLessonClick={(l) => console.log('Abrir aula: ', l)}
-            mode="edit"
-            moduleId="module-1"
+
+        {!!adminCourses.length && session?.role === 'ADMIN' && (
+          <CardSession
+            title="Cursos pendentes de publicação"
+            more
+            items={adminCourses.map((i) => ({
+              imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+              imageAlt: i.name,
+              title: i.name,
+              courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+              onClick: () => router.push(`/dashboard/cursos/novo/${i.id}`),
+              buttonText: 'Revisar curso',
+              leftIcon: 'fluent:edit-24-regular',
+            }))}
           />
-        </div>
+        )}
+
+        {!!myCourses.length && (
+          <CardSession
+            title="Seus cursos"
+            more
+            items={myCourses.map((i) => ({
+              imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+              imageAlt: i.name,
+              title: i.name,
+              courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+              onClick: () => router.push(`/dashboard/cursos/${i.id}`),
+              buttonText: 'Ver curso',
+            }))}
+          />
+        )}
+
+        {!!recommendedCourses.length && (
+          <CardSession
+            title="Cursos recomendados"
+            more
+            items={recommendedCourses.map((i) => ({
+              imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
+              imageAlt: i.name,
+              title: i.name,
+              courseName: `${i.totalLessons} aulas - ${formatMinutes(Number(i.minutes))}`,
+              onClick: () => router.push(`/dashboard/cursos/${i.id}`),
+              buttonText: 'Ver curso',
+            }))}
+          />
+        )}
       </div>
 
       <ModalCreateCourse
