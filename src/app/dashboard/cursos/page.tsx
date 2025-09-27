@@ -94,7 +94,7 @@ export default function Page() {
               imageUrl: `${process.env.NEXT_PUBLIC_API_URL}/upload/${i.cover_key}`,
               imageAlt: i.name,
               title: i.name,
-              courseName: `${i.totalLessons} aulas}`,
+              courseName: `${i.totalLessons} aulas`,
               onClick: () => router.push(`/dashboard/cursos/${i.id}`),
               buttonText: 'Ver curso',
             }))}
